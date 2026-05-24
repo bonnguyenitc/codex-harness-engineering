@@ -1,0 +1,50 @@
+# Ghi chú nghiên cứu về Harness Engineering
+
+Kho này lưu các ghi chú Markdown về **harness engineering** cho AI agent làm
+việc dài hạn.
+
+## Phạm vi nguồn
+
+Chỉ dùng bốn bài sau:
+
+- `[S1]` OpenAI, "Harness engineering: leveraging Codex in an agent-first world".
+- `[S2]` Anthropic, "Effective harnesses for long-running agents".
+- `[S3]` Anthropic, "Building effective agents".
+- `[S4]` Anthropic, "Harness design for long-running application development".
+
+Không thêm resource, citation, paper, DOI, benchmark, hoặc blog khác nếu người
+dùng chưa yêu cầu mở rộng phạm vi.
+
+## Bản đồ tài liệu
+
+- Đọc `README.md` trước để nắm mục tiêu và thứ tự đọc.
+- Bản tổng hợp nghiên cứu chính nằm ở
+  `docs/harness-engineering/research-note.md`.
+- Hướng dẫn triển khai thực tế nằm ở
+  `docs/harness-engineering/implementation-playbook.md`.
+- Danh mục nguồn đã xác minh nằm ở `docs/harness-engineering/sources.md`.
+- Skill thực hành tạo harness nằm ở `skills/creator-harness/SKILL.md`.
+
+## Quy tắc viết
+
+- Mọi nhận định quan trọng phải truy vết được về `[S1]`, `[S2]`, `[S3]`, hoặc
+  `[S4]`.
+- Không tự bịa citation, paper, tác giả, ngày tháng, DOI, benchmark, hoặc số
+  liệu.
+- Nếu chưa xác minh được nguồn, đánh dấu rõ bằng marker tiếng Việt cho nội
+  dung cần xác minh.
+- Viết theo phong cách nghiên cứu: luận điểm, bằng chứng, hệ quả.
+- Phân biệt rõ đâu là kết luận từ nguồn và đâu là diễn giải của tài liệu này.
+
+## Quy trình cập nhật
+
+1. Đọc `docs/harness-engineering/sources.md`.
+2. Cập nhật phần liên quan trong research note hoặc playbook.
+3. Chỉ thêm nguồn mới nếu người dùng yêu cầu mở rộng ngoài bốn bài.
+4. Kiểm tra placeholder và citation ngoài phạm vi trước khi hoàn tất.
+
+## Ràng buộc local
+
+- Không chạy lệnh Xcode hoặc Android.
+- Khi dùng shell trong repo này, prefix lệnh bằng `rtk` theo
+  `/Users/${USER}/.codex/RTK.md`.
