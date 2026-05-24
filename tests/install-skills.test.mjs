@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 import { installSkills, parseArgs, SKILL_NAMES } from "../scripts/install-skills.mjs";
@@ -33,6 +34,41 @@ test("installSkills copies skills into home and docs into the target project", a
 test("parseArgs accepts init and init --force", () => {
   assert.deepEqual(parseArgs(["init"]), { command: "init", force: false });
   assert.deepEqual(parseArgs(["init", "--force"]), { command: "init", force: true });
+});
+
+test("CLI runs when invoked through a symlinked npm bin", async () => {
+  const home = await mkdtemp(path.join(tmpdir(), "harness-skills-"));
+  const projectRoot = await mkdtemp(path.join(tmpdir(), "harness-project-"));
+  const binRoot = await mkdtemp(path.join(tmpdir(), "harness-bin-"));
+  const scriptPath = path.resolve("scripts", "install-skills.mjs");
+  const binPath = path.join(binRoot, "codex-harness-engineering");
+
+  try {
+    await chmod(scriptPath, 0o755);
+    await symlink(scriptPath, binPath);
+
+    const result = spawnSync(binPath, ["init"], {
+      cwd: projectRoot,
+      env: { ...process.env, HOME: home },
+      encoding: "utf8",
+    });
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /Installed 3 skills/);
+    assert.match(result.stdout, /Copied docs/);
+    assert.match(
+      await readFile(path.join(home, ".agents", "skills", "creator-harness", "SKILL.md"), "utf8"),
+      /^---\nname: creator-harness/m
+    );
+    assert.match(
+      await readFile(path.join(projectRoot, "docs", "harness-engineering", "index.md"), "utf8"),
+      /Harness Engineering/
+    );
+  } finally {
+    await rm(home, { recursive: true, force: true });
+    await rm(projectRoot, { recursive: true, force: true });
+    await rm(binRoot, { recursive: true, force: true });
+  }
 });
 
 test("installSkills refuses to overwrite existing targets without force", async () => {

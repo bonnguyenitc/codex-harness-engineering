@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { realpathSync } from "node:fs";
 import { access, cp, mkdir, rm } from "node:fs/promises";
 import { homedir } from "node:os";
 import path from "node:path";
@@ -76,7 +77,12 @@ export function parseArgs(args) {
 }
 
 function isDirectRun() {
-  return import.meta.url === pathToFileURL(process.argv[1]).href;
+  if (!process.argv[1]) {
+    return false;
+  }
+
+  return pathToFileURL(realpathSync(process.argv[1])).href ===
+    pathToFileURL(realpathSync(fileURLToPath(import.meta.url))).href;
 }
 
 if (isDirectRun()) {
