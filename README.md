@@ -49,6 +49,42 @@ Kho này biến bốn nguồn thành một harness tối thiểu cho Codex:
 | `skills/acceptance-contract/SKILL.md` | Skill chốt scope, tiêu chí done, và verification trước khi làm |
 | `skills/cleanup-harness/SKILL.md` | Skill cleanup có trigger, acceptance criteria, và rollback |
 
+## Phát hành qua NPM
+
+Package NPM này ship nguyên `docs/`, `skills/`, `README.md`, và `AGENTS.md`.
+Chạy lệnh sau ở root của project muốn nhận docs:
+
+```bash
+npx codex-harness-engineering init
+```
+
+Lệnh này copy 3 skill vào `$HOME/.agents/skills` và copy docs vào
+`./docs/harness-engineering` của project hiện tại. Nếu các target đã tồn tại,
+lệnh sẽ dừng để tránh ghi đè. Dùng `--force` khi muốn thay thế bản cũ:
+
+```bash
+npx codex-harness-engineering init --force
+```
+
+Khi phát triển local:
+
+```bash
+npm test
+npm run pack:dry
+node scripts/install-skills.mjs init
+```
+
+Khi publish:
+
+```bash
+./scripts/publish.sh
+./scripts/publish.sh minor
+./scripts/publish.sh 0.2.0
+```
+
+Tên package hiện tại là `codex-harness-engineering`. Nếu tên này đã có trên
+NPM, đổi trường `name` trong `package.json` trước khi publish.
+
 ## Cách dùng cho Codex
 
 Khi bắt đầu một task trong repo phần mềm khác, dùng kho này như harness template:
