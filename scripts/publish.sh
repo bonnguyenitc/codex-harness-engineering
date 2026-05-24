@@ -1,19 +1,25 @@
 #!/usr/bin/env bash
-
-# scripts/publish.sh
-#
 # Bump version, verify package contents, publish to npm, then commit/tag/push.
 #
 # Usage:
-# ./scripts/publish.sh                    # patch bump
-# ./scripts/publish.sh minor              # minor bump
-# ./scripts/publish.sh major              # major bump
-# ./scripts/publish.sh 0.2.0              # exact version
-# ./scripts/publish.sh patch --otp 123456 # npm 2FA
+#   ./scripts/publish.sh                    # patch bump
+#   ./scripts/publish.sh minor              # minor bump
+#   ./scripts/publish.sh major              # major bump
+#   ./scripts/publish.sh 0.2.0              # exact version
+#   ./scripts/publish.sh patch --otp 123456 # npm 2FA
 
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+
+usage() {
+  echo "Usage: ./scripts/publish.sh [patch|minor|major|x.y.z] [--otp 123456]"
+}
+
+die() {
+  echo "$*" >&2
+  exit 1
+}
 
 BUMP="patch"
 OTP="${NPM_CONFIG_OTP:-}"
@@ -21,10 +27,7 @@ OTP="${NPM_CONFIG_OTP:-}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --otp)
-      if [[ $# -lt 2 ]]; then
-        echo "Missing value for --otp"
-        exit 1
-      fi
+      [[ $# -ge 2 ]] || die "Missing value for --otp"
       OTP="$2"
       shift 2
       ;;
@@ -32,18 +35,17 @@ while [[ $# -gt 0 ]]; do
       OTP="${1#--otp=}"
       shift
       ;;
-    patch|minor|major|prepatch|preminor|premajor|prerelease)
+    patch|minor|major|prepatch|preminor|premajor|prerelease|[0-9]*)
       BUMP="$1"
       shift
       ;;
-    [0-9]*)
-      BUMP="$1"
-      shift
+    -h|--help)
+      usage
+      exit 0
       ;;
     *)
-      echo "Unknown argument: $1"
-      echo "Usage: ./scripts/publish.sh [patch|minor|major|x.y.z] [--otp 123456]"
-      exit 1
+      usage >&2
+      die "Unknown argument: $1"
       ;;
   esac
 done
@@ -62,17 +64,9 @@ rollback_version() {
   fi
 }
 
-on_error() {
-  rollback_version
-  exit 1
-}
+trap rollback_version ERR
 
-trap on_error ERR
-
-if [[ -z "$BRANCH" ]]; then
-  echo "Cannot determine current git branch."
-  exit 1
-fi
+[[ -n "$BRANCH" ]] || die "Cannot determine current git branch."
 
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "Working tree is not clean. Commit or stash changes before publishing."
@@ -81,8 +75,7 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 
 if ! npm whoami >/dev/null 2>&1; then
-  echo "Not logged in to npm. Run: npm login"
-  exit 1
+  die "Not logged in to npm. Run: npm login"
 fi
 
 echo "Package: $PACKAGE_NAME"
@@ -124,11 +117,13 @@ git add package.json
 if [[ -f package-lock.json ]]; then
   git add package-lock.json
 fi
+
 if ! git diff --cached --quiet; then
   git commit -m "chore: publish $PACKAGE_NAME@$NEW_VERSION"
 else
   echo "No version file changes to commit."
 fi
+
 if git rev-parse "v$NEW_VERSION" >/dev/null 2>&1; then
   echo "Tag v$NEW_VERSION already exists; skipping tag creation."
 else
