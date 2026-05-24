@@ -2,6 +2,13 @@
   "name": "codex-harness-engineering",
   "version": "0.1.0",
   "description": "Codex harness engineering docs and installable agent skills.",
+  "keywords": [
+    "codex",
+    "harness-engineering",
+    "agent-skills",
+    "ai-agents",
+    "long-running-agents"
+  ],
   "type": "module",
   "bin": {
     "codex-harness-engineering": "scripts/install-skills.mjs",
