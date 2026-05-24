@@ -91,8 +91,13 @@ echo "Bump: $BUMP"
 echo "Branch: $BRANCH"
 echo ""
 
-NEW_VERSION="$(npm version "$BUMP" --no-git-tag-version)"
-NEW_VERSION="${NEW_VERSION#v}"
+if [[ "$BUMP" == "$CURRENT_VERSION" ]]; then
+  NEW_VERSION="$CURRENT_VERSION"
+  echo "Version is already $NEW_VERSION; skipping npm version."
+else
+  NEW_VERSION="$(npm version "$BUMP" --no-git-tag-version)"
+  NEW_VERSION="${NEW_VERSION#v}"
+fi
 
 echo "New version: $NEW_VERSION"
 echo ""
@@ -119,8 +124,16 @@ git add package.json
 if [[ -f package-lock.json ]]; then
   git add package-lock.json
 fi
-git commit -m "chore: publish $PACKAGE_NAME@$NEW_VERSION"
-git tag "v$NEW_VERSION"
+if ! git diff --cached --quiet; then
+  git commit -m "chore: publish $PACKAGE_NAME@$NEW_VERSION"
+else
+  echo "No version file changes to commit."
+fi
+if git rev-parse "v$NEW_VERSION" >/dev/null 2>&1; then
+  echo "Tag v$NEW_VERSION already exists; skipping tag creation."
+else
+  git tag "v$NEW_VERSION"
+fi
 
 echo ""
 echo "Pushing $BRANCH and tags..."
