@@ -5,19 +5,69 @@
 # Bump version, verify package contents, publish to npm, then commit/tag/push.
 #
 # Usage:
-# ./scripts/publish.sh        # patch bump
-# ./scripts/publish.sh minor  # minor bump
-# ./scripts/publish.sh major  # major bump
-# ./scripts/publish.sh 0.2.0  # exact version
+# ./scripts/publish.sh                    # patch bump
+# ./scripts/publish.sh minor              # minor bump
+# ./scripts/publish.sh major              # major bump
+# ./scripts/publish.sh 0.2.0              # exact version
+# ./scripts/publish.sh patch --otp 123456 # npm 2FA
 
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-BUMP="${1:-patch}"
+BUMP="patch"
+OTP="${NPM_CONFIG_OTP:-}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --otp)
+      if [[ $# -lt 2 ]]; then
+        echo "Missing value for --otp"
+        exit 1
+      fi
+      OTP="$2"
+      shift 2
+      ;;
+    --otp=*)
+      OTP="${1#--otp=}"
+      shift
+      ;;
+    patch|minor|major|prepatch|preminor|premajor|prerelease)
+      BUMP="$1"
+      shift
+      ;;
+    [0-9]*)
+      BUMP="$1"
+      shift
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      echo "Usage: ./scripts/publish.sh [patch|minor|major|x.y.z] [--otp 123456]"
+      exit 1
+      ;;
+  esac
+done
+
 PACKAGE_NAME="$(node -p "require('./package.json').name")"
 CURRENT_VERSION="$(node -p "require('./package.json').version")"
 BRANCH="$(git branch --show-current)"
+NEW_VERSION=""
+PUBLISHED=0
+
+rollback_version() {
+  if [[ "$PUBLISHED" -eq 0 && -n "$NEW_VERSION" ]]; then
+    echo ""
+    echo "Publish did not complete. Rolling package.json back to $CURRENT_VERSION..."
+    npm version "$CURRENT_VERSION" --no-git-tag-version >/dev/null 2>&1 || true
+  fi
+}
+
+on_error() {
+  rollback_version
+  exit 1
+}
+
+trap on_error ERR
 
 if [[ -z "$BRANCH" ]]; then
   echo "Cannot determine current git branch."
@@ -56,7 +106,12 @@ npm pack --dry-run
 
 echo ""
 echo "Publishing $PACKAGE_NAME@$NEW_VERSION to npm..."
-npm publish --access public
+PUBLISH_ARGS=(publish --access public)
+if [[ -n "$OTP" ]]; then
+  PUBLISH_ARGS+=(--otp "$OTP")
+fi
+npm "${PUBLISH_ARGS[@]}"
+PUBLISHED=1
 
 echo ""
 echo "Committing and tagging release..."

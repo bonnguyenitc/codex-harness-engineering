@@ -80,7 +80,11 @@ Khi publish:
 ./scripts/publish.sh
 ./scripts/publish.sh minor
 ./scripts/publish.sh 0.2.0
+./scripts/publish.sh patch --otp 123456
 ```
+
+Nếu tài khoản NPM bật 2FA cho publish, truyền OTP bằng `--otp` hoặc
+`NPM_CONFIG_OTP`.
 
 Tên package hiện tại là `codex-harness-engineering`. Nếu tên này đã có trên
 NPM, đổi trường `name` trong `package.json` trước khi publish.
