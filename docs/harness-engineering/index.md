@@ -11,12 +11,13 @@
 
 ## Phạm vi
 
-Tài liệu này chỉ nghiên cứu harness engineering qua bốn bài:
+Tài liệu này nghiên cứu harness engineering qua năm bài:
 
 - `[S1]` OpenAI, "Harness engineering: leveraging Codex in an agent-first world".
 - `[S2]` Anthropic, "Effective harnesses for long-running agents".
 - `[S3]` Anthropic, "Building effective agents".
 - `[S4]` Anthropic, "Harness design for long-running application development".
+- `[S5]` Google DeepMind, "AutoHarness: Improving LLM Agents by Automatically Synthesizing a Code Harness" & Google Cloud agent engineering practices.
 
 Mọi nguồn khác đã bị loại khỏi narrative hiện tại để giữ trọng tâm đúng yêu cầu.
 
@@ -26,7 +27,7 @@ Harness engineering trả lời câu hỏi: môi trường nào giúp một agen
 triển phần mềm dài hạn mà không phụ thuộc hoàn toàn vào trí nhớ hội thoại hoặc
 tự đánh giá chủ quan?
 
-Bốn bài tạo thành một chuỗi logic:
+Năm bài tạo thành một chuỗi logic:
 
 1. `[S3]` đưa nguyên tắc nền: bắt đầu bằng giải pháp đơn giản nhất, phân biệt
    workflow với agent, và chỉ tăng complexity khi tradeoff đáng giá.
@@ -36,6 +37,7 @@ Bốn bài tạo thành một chuỗi logic:
    chất lượng chủ quan, và QA qua runtime.
 4. `[S1]` mở rộng thành kỷ luật repository-level: tri thức trong repo, môi
    trường dễ đọc với agent, invariant cơ học, throughput, và cleanup.
+5. `[S5]` bổ sung khả năng tự động hóa sinh lớp bọc thực thi (AutoHarness) và các phương pháp đánh giá vết chạy (Trajectory Evaluation) cùng LLM-as-a-judge.
 
 ## Luận điểm chính
 
@@ -50,6 +52,7 @@ Bốn bài tạo thành một chuỗi logic:
    hơn để generator sửa [S4].
 6. Tài liệu không đủ để giữ kiến trúc; invariant nên được mã hóa bằng lint,
    structural test, CI, và cleanup [S1].
+7. Khi quy tắc môi trường quá phức tạp để tự viết, có thể dùng mô hình tự động sinh lớp bọc bằng code (AutoHarness) và đánh giá vết chạy (Trajectory Evaluation) tự động [S5].
 
 ## Định nghĩa làm việc
 

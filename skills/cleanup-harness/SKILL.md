@@ -11,10 +11,9 @@ Treat cleanup as a scoped harness task, not opportunistic refactoring. Cleanup
 needs a trigger, acceptance criteria, verification, and rollback path because
 high agent throughput can spread weak patterns quickly.
 
-In this repository, follow the local source policy: use only `[S1]-[S4]` for
-harness claims unless the user explicitly expands the source scope. Read
-`docs/harness-engineering/sources.md` only when you need to check that policy.
-For cleanup templates, prefer the relevant section of
+In this repository, follow the local source policy: use only `[S1]-[S5]` for
+harness claims. Read `docs/harness-engineering/sources.md` only when you need to
+check that policy. For cleanup templates, prefer the relevant section of
 `docs/harness-engineering/implementation-playbook.md` instead of loading the
 whole research note.
 
@@ -88,3 +87,4 @@ Do not add broad rules that protect no concrete invariant.
 - Keep the intervention as simple as the failure mode allows [S3].
 - Long-running work benefits from explicit state, verification, and recovery
   points [S2], [S4].
+- AutoHarness can automatically enforce code constraints to reduce cleanup debt, and trajectory evaluation tracks whether cleanup alters agent execution paths [S5].

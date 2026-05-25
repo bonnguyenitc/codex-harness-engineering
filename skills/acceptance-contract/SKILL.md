@@ -11,10 +11,9 @@ Turn an unclear request into a small, verifiable contract before implementation.
 Use this skill when "done" is ambiguous, the task could drift, or an agent may
 claim completion without evidence.
 
-In this repository, follow the local source policy: use only `[S1]-[S4]` for
-harness claims unless the user explicitly expands the source scope. Read
-`docs/harness-engineering/sources.md` only when you need to check that policy.
-For templates, prefer the relevant section of
+In this repository, follow the local source policy: use only `[S1]-[S5]` for
+harness claims. Read `docs/harness-engineering/sources.md` only when you need to
+check that policy. For templates, prefer the relevant section of
 `docs/harness-engineering/implementation-playbook.md` instead of loading the
 whole research note.
 
@@ -76,3 +75,4 @@ before writing code.
 - Runtime-visible checks improve agent feedback loops [S1], [S2], [S4].
 - Sprint contracts and evaluator criteria help when task quality is subjective
   or multi-step [S4].
+- Trajectory evaluation and LLM-as-a-judge monitor execution path quality, and AutoHarness enforces constraints when manual rules are too complex [S5].

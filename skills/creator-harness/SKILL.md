@@ -11,14 +11,14 @@ Create the smallest harness that changes agent behavior. A harness is the
 control plane around an agent: durable state, readable tools, verification
 loops, evaluator feedback when needed, and mechanical guardrails.
 
-Use only the local four-source research as the source of truth:
+Use only the local five-source research as the source of truth:
 
 - `docs/harness-engineering/sources.md`
 - `docs/harness-engineering/research-note.md`
 - `docs/harness-engineering/implementation-playbook.md`
 
 Do not introduce external harness resources unless the user explicitly asks to
-expand beyond the four OpenAI/Anthropic articles.
+expand beyond the five OpenAI/Anthropic/Google articles.
 
 ## Working Rules
 
@@ -62,7 +62,9 @@ expand beyond the four OpenAI/Anthropic articles.
    - invisible runtime: browser/API/log/metric/trace checks;
    - weak self-review: evaluator rubric or separate evaluator pass;
    - drift: structural lint or architecture test;
-   - throughput entropy: targeted cleanup task with verification.
+   - throughput entropy: targeted cleanup task with verification;
+   - complex constraints: AutoHarness synthesized code wrapper [S5];
+   - agent trajectory drift: Trajectory Evaluation and LLM-as-a-judge [S5].
 
 4. Write a harness contract:
    - agent role and allowed scope;
@@ -93,6 +95,7 @@ expand beyond the four OpenAI/Anthropic articles.
 | UI/runtime-heavy app        | Sprint contract, browser/API checks, evaluator notes      |
 | Long application build      | Planner, generator, evaluator, sprint contract            |
 | Architecture-sensitive repo | Dependency rules, structural tests, cleanup cadence       |
+| Complex or rule-heavy env   | AutoHarness (wrapper), Trajectory evaluation / VeRO       |
 
 ## Output Shape
 
