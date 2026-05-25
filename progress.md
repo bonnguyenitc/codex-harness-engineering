@@ -158,3 +158,34 @@
 
 - Dùng phần quy chuẩn này khi cài package vào project đích và điều chỉnh tập
   behavior artifact theo workflow cụ thể của project đó.
+
+## 2026-05-25 - Them repository URL vao package
+
+### Context
+
+- Task: Dua URL GitHub cong khai cua repository vao metadata package NPM.
+- Relevant files: `package.json`, `feature_list.json`, `progress.md`.
+
+### Done
+
+- Them truong `repository` theo dinh dang npm vao `package.json`.
+- Su dung URL GitHub cong khai, khong dua credential tu remote local vao
+  package metadata.
+- Danh dau capability metadata `H006` la verified trong `feature_list.json`.
+
+### Verification
+
+- Baseline command: `./init.sh`.
+- Baseline result: pass voi 13 test truoc khi them repository metadata.
+- Command: `npm run verify`.
+- Result: pass; verifier bao `Harness verification passed.` va 13 test pass.
+- Command: `npm run pack:dry`.
+- Result: pass; tao dry-run package `codex-harness-engineering-0.1.4.tgz`.
+- Command: kiem tra gia tri `repository.url` trong `package.json` va
+  `git diff --check`.
+- Result: pass; URL cong khai dung voi GitHub repository va khong chua
+  credential; diff khong co loi whitespace.
+
+### Next
+
+- Khong co buoc tiep theo mo cho thay doi metadata package hien tai.

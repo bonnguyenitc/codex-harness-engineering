@@ -91,5 +91,23 @@
       "2026-05-25: npm run verify passed with Harness verification passed and 13 tests passing.",
       "2026-05-25: npm run pack:dry passed for codex-harness-engineering-0.1.3.tgz."
     ]
+  },
+  {
+    "id": "H006",
+    "title": "Published package repository metadata",
+    "status": "verified",
+    "acceptance": [
+      "The npm package manifest exposes the public GitHub repository URL.",
+      "The repository URL stored in package metadata contains no embedded credential."
+    ],
+    "verify": [
+      "npm run verify",
+      "npm run pack:dry"
+    ],
+    "evidence": [
+      "2026-05-25: npm run verify passed with Harness verification passed and 13 tests passing.",
+      "2026-05-25: npm run pack:dry passed for codex-harness-engineering-0.1.4.tgz.",
+      "2026-05-25: package metadata assertion confirmed the public repository URL contains no embedded credential."
+    ]
   }
 ]

@@ -2,6 +2,10 @@
   "name": "codex-harness-engineering",
   "version": "0.1.4",
   "description": "Codex harness engineering docs and installable agent skills.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bonnguyenitc/codex-harness-engineering.git"
+  },
   "keywords": [
     "codex",
     "harness-engineering",
