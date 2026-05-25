@@ -95,3 +95,62 @@ test("verifyHarness reports a required artifact missing from the README map", as
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("verifyHarness requires durable state updates for implementation changes", async () => {
+  const root = await createHarness();
+
+  try {
+    const errors = await verifyHarness(root, {
+      changedFiles: ["scripts/install-skills.mjs"],
+    });
+    assert.deepEqual(errors, [
+      "feature_list.json: must be updated when implementation or harness behavior changes",
+      "progress.md: must be updated when implementation or harness behavior changes",
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("verifyHarness requires progress to name each changed behavior artifact", async () => {
+  const root = await createHarness();
+
+  try {
+    const errors = await verifyHarness(root, {
+      changedFiles: ["scripts/install-skills.mjs", "feature_list.json", "progress.md"],
+    });
+    assert.deepEqual(errors, [
+      "progress.md: latest entry must reference changed behavior artifact scripts/install-skills.mjs",
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("verifyHarness does not accept behavior artifacts mentioned only in older progress entries", async () => {
+  const root = await createHarness({
+    "progress.md": [
+      "# Progress",
+      "",
+      "## Old task",
+      "",
+      "- Relevant files: `scripts/install-skills.mjs`.",
+      "",
+      "## Current task",
+      "",
+      "- Relevant files: `README.md`.",
+      "",
+    ].join("\n"),
+  });
+
+  try {
+    const errors = await verifyHarness(root, {
+      changedFiles: ["scripts/install-skills.mjs", "feature_list.json", "progress.md"],
+    });
+    assert.deepEqual(errors, [
+      "progress.md: latest entry must reference changed behavior artifact scripts/install-skills.mjs",
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

@@ -7,7 +7,7 @@ import test from "node:test";
 
 import { installSkills, parseArgs, SKILL_NAMES } from "../scripts/install-skills.mjs";
 
-test("installSkills copies skills into home and docs into the target project", async () => {
+test("installSkills copies skills and docs into the target project", async () => {
   const home = await mkdtemp(path.join(tmpdir(), "harness-skills-"));
   const projectRoot = await mkdtemp(path.join(tmpdir(), "harness-project-"));
 
@@ -17,10 +17,14 @@ test("installSkills copies skills into home and docs into the target project", a
     assert.deepEqual(result.installed.sort(), [...SKILL_NAMES].sort());
 
     for (const skillName of SKILL_NAMES) {
-      const skillPath = path.join(home, ".agents", "skills", skillName, "SKILL.md");
+      const skillPath = path.join(projectRoot, ".agents", "skills", skillName, "SKILL.md");
       const content = await readFile(skillPath, "utf8");
       assert.match(content, /^---\nname:/);
     }
+    await assert.rejects(
+      readFile(path.join(home, ".agents", "skills", "creator-harness", "SKILL.md"), "utf8"),
+      { code: "ENOENT" }
+    );
 
     const docsIndex = path.join(projectRoot, "docs", "harness-engineering", "index.md");
     const docsContent = await readFile(docsIndex, "utf8");
@@ -57,8 +61,12 @@ test("CLI runs when invoked through a symlinked npm bin", async () => {
     assert.match(result.stdout, /Installed 3 skills/);
     assert.match(result.stdout, /Copied docs/);
     assert.match(
-      await readFile(path.join(home, ".agents", "skills", "creator-harness", "SKILL.md"), "utf8"),
+      await readFile(path.join(projectRoot, ".agents", "skills", "creator-harness", "SKILL.md"), "utf8"),
       /^---\nname: creator-harness/m
+    );
+    await assert.rejects(
+      readFile(path.join(home, ".agents", "skills", "creator-harness", "SKILL.md"), "utf8"),
+      { code: "ENOENT" }
     );
     assert.match(
       await readFile(path.join(projectRoot, "docs", "harness-engineering", "index.md"), "utf8"),
@@ -95,7 +103,7 @@ test("installSkills overwrites existing targets with force", async () => {
   try {
     await installSkills({ home, projectRoot });
 
-    const skillPath = path.join(home, ".agents", "skills", "creator-harness", "SKILL.md");
+    const skillPath = path.join(projectRoot, ".agents", "skills", "creator-harness", "SKILL.md");
     const docsIndex = path.join(projectRoot, "docs", "harness-engineering", "index.md");
     await mkdir(path.dirname(skillPath), { recursive: true });
     await writeFile(skillPath, "local edit", "utf8");

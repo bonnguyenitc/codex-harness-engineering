@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { execFileSync } from "node:child_process";
 import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -22,6 +23,13 @@ const REQUIRED_FILES = [
 const README_MAPPED_FILES = REQUIRED_FILES.filter(
   (relativePath) => relativePath !== "AGENTS.md" && relativePath !== "README.md"
 );
+const STATE_FILES = ["feature_list.json", "progress.md"];
+const BEHAVIOR_CHANGE_PATTERNS = [
+  /^(scripts|tests|skills)\//,
+  /^package(?:-lock)?\.json$/,
+  /^init\.sh$/,
+  /^AGENTS\.md$/,
+];
 
 async function exists(filePath) {
   try {
@@ -54,7 +62,32 @@ async function markdownFiles(directory, relativeRoot) {
   return found;
 }
 
-export async function verifyHarness(root = PACKAGE_ROOT) {
+function changesHarnessBehavior(relativePath) {
+  return BEHAVIOR_CHANGE_PATTERNS.some((pattern) => pattern.test(relativePath));
+}
+
+function changedFilesInGit(root) {
+  try {
+    const modified = execFileSync("git", ["diff", "--name-only", "HEAD", "--"], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    const untracked = execFileSync("git", ["ls-files", "--others", "--exclude-standard"], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    return [...new Set(`${modified}\n${untracked}`.split("\n").filter(Boolean))];
+  } catch {
+    return [];
+  }
+}
+
+function latestProgressEntry(progress) {
+  const entryStart = progress.lastIndexOf("\n## ");
+  return entryStart === -1 ? progress : progress.slice(entryStart + 1);
+}
+
+export async function verifyHarness(root = PACKAGE_ROOT, { changedFiles = [] } = {}) {
   const errors = [];
 
   for (const relativePath of REQUIRED_FILES) {
@@ -95,6 +128,29 @@ export async function verifyHarness(root = PACKAGE_ROOT) {
     }
   }
 
+  const behaviorChanges = changedFiles.filter(changesHarnessBehavior);
+  if (behaviorChanges.length > 0) {
+    for (const stateFile of STATE_FILES) {
+      if (!changedFiles.includes(stateFile)) {
+        errors.push(
+          `${stateFile}: must be updated when implementation or harness behavior changes`
+        );
+      }
+    }
+
+    if (changedFiles.includes("progress.md") && await exists(path.join(root, "progress.md"))) {
+      const progress = await readFile(path.join(root, "progress.md"), "utf8");
+      const latestEntry = latestProgressEntry(progress);
+      for (const relativePath of behaviorChanges) {
+        if (!latestEntry.includes(`\`${relativePath}\``)) {
+          errors.push(
+            `progress.md: latest entry must reference changed behavior artifact ${relativePath}`
+          );
+        }
+      }
+    }
+  }
+
   return errors;
 }
 
@@ -104,7 +160,9 @@ function isDirectRun() {
 }
 
 if (isDirectRun()) {
-  const errors = await verifyHarness();
+  const errors = await verifyHarness(PACKAGE_ROOT, {
+    changedFiles: changedFilesInGit(PACKAGE_ROOT),
+  });
 
   if (errors.length > 0) {
     for (const error of errors) {

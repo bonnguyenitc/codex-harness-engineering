@@ -31,8 +31,13 @@ dùng chưa yêu cầu mở rộng phạm vi.
 1. Đọc `README.md`, `progress.md`, và `feature_list.json`.
 2. Xem lịch sử git gần nhất để nhận biết thay đổi đang tiếp tục.
 3. Chạy `./init.sh` để kiểm tra baseline rẻ nhất trước khi sửa.
-4. Chỉ cập nhật trạng thái feature sau khi lệnh verify liên quan pass.
-5. Ghi kết quả kiểm chứng và bước tiếp theo vào `progress.md` khi task kéo dài.
+4. Khi task thay đổi hành vi, guardrail, package, script, test, skill, hoặc
+   quy tắc agent, chỉ đánh dấu feature đã verify sau khi lệnh kiểm tra liên quan
+   pass.
+5. Với các thay đổi ở mục 4, luôn cập nhật `feature_list.json` và `progress.md`
+   trước khi hoàn tất, kể cả task nhỏ. Chỉ task chỉnh nội dung nghiên cứu thuần
+   túy mới có thể chỉ ghi `progress.md` khi kéo dài. Mục `Relevant files` trong
+   entry mới nhất của progress phải liệt kê các artifact hành vi đã đổi.
 
 ## Lệnh chuẩn
 
@@ -40,6 +45,8 @@ dùng chưa yêu cầu mở rộng phạm vi.
 - Kiểm thử package: `npm test`.
 - Kiểm guardrail harness và test: `npm run verify`.
 - Kiểm nội dung package xuất bản: `npm run pack:dry`.
+- `npm run verify` phải fail nếu working tree có thay đổi hành vi harness mà
+  thiếu cập nhật `feature_list.json` hoặc `progress.md`.
 
 ## Quy tắc viết
 

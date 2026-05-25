@@ -51,6 +51,90 @@ Nếu phải chọn giữa prose thuần và state có cấu trúc cho tiến đ
 tiên dạng như `feature_list.json`: session mới dễ chọn một feature, giữ trạng
 thái pass/fail nhất quán, và tránh suy diễn lại từ ghi chú tự do [S2].
 
+## Quy chuẩn tạo harness cho project khác
+
+Áp dụng mục này khi đưa harness vào một repository sản phẩm hoặc nghiên cứu
+khác. Mục tiêu là tạo một baseline có thể tiếp tục qua session và phát hiện
+việc agent tuyên bố hoàn tất khi chưa cập nhật bằng chứng, không phải sao chép
+toàn bộ công cụ của repository mẫu [S1], [S2], [S3].
+
+### Chuẩn bắt buộc
+
+| Thành phần | Contract tối thiểu | Cách kiểm tra |
+| --- | --- | --- |
+| `AGENTS.md` | Nêu thứ tự đọc, lệnh khởi động, lệnh verify, giới hạn local, và rule cập nhật state | Session mới đọc được đường vào repo trong một lượt ngắn |
+| `README.md` | Mô tả mục tiêu, bản đồ artifact, và lệnh vận hành chính | Các artifact trong harness có link hoặc đường dẫn tìm được |
+| `init.sh` hoặc lệnh tương đương | Chạy baseline rẻ, lặp lại được ở đầu session | Chạy thành công trên checkout sạch hoặc báo lỗi hành động được |
+| `feature_list.json` hoặc trạng thái có cấu trúc tương đương | Mỗi capability có acceptance, verify command, status, evidence | Status chỉ chuyển sang verified sau khi lệnh liên quan pass |
+| `progress.md` | Mỗi vòng làm việc ghi task, artifact liên quan, kết quả verify và bước tiếp theo | Session mới xác định được công việc đang mở mà không cần chat history |
+| Test/verify command | Cưỡng chế invariant quan trọng thay vì chỉ ghi bằng prose | Lệnh verify fail khi invariant bị phá |
+
+Đây là diễn giải triển khai từ repository-local knowledge và mechanical
+guardrail của [S1], kết hợp state handoff và quy trình verify-before-status của
+[S2]. Với task nhỏ không thay đổi hành vi hay guardrail, project có thể chỉ
+dùng acceptance criteria và lệnh verify rõ theo nguyên tắc bắt đầu đơn giản
+của [S3].
+
+### Contract cập nhật state
+
+Một project áp dụng harness nên định nghĩa **behavior artifact** là file làm
+thay đổi cách sản phẩm, package, test, guardrail, skill hoặc agent hoạt động.
+Ví dụ thường gặp: source code, `scripts/`, `tests/`, `skills/`, manifest
+package, workflow verify, và `AGENTS.md`.
+
+Khi task chạm behavior artifact:
+
+1. Chạy baseline trước sửa và ghi lại trạng thái ban đầu nếu task có rủi ro
+   hồi quy.
+2. Nêu acceptance criteria và command kiểm chứng trước khi chuyển trạng thái.
+3. Sau khi verify pass, cập nhật feature state với evidence cụ thể.
+4. Thêm entry mới nhất vào progress, liệt kê behavior artifact đã đổi, command
+   đã chạy, kết quả, và bước tiếp theo.
+5. Chỉ tuyên bố hoàn tất hoặc commit checkpoint sau khi gate state và lệnh
+   verify đều pass.
+
+Contract này ngăn hai failure mode: session sau mất dấu thay đổi đã làm và
+agent kết thúc sớm chỉ vì code/test cục bộ đã xanh trong khi state handoff chưa
+được cập nhật [S2]. Khi omission lặp lại, quy tắc này nên được mã hóa thành
+check chạy được thay vì phụ thuộc vào nhắc nhở prose [S1].
+
+### Gate cơ học tối thiểu
+
+Project có thay đổi hành vi qua nhiều session nên đưa các invariant sau vào
+`verify` hoặc CI:
+
+| Invariant | Gate đề xuất |
+| --- | --- |
+| Artifact bắt buộc không bị mất | Fail khi thiếu `AGENTS.md`, state file, bootstrap hoặc docs map cần thiết |
+| Thay đổi hành vi không thiếu handoff | Nếu diff chạm behavior artifact, fail khi không có cập nhật feature state và progress |
+| Progress không dùng bằng chứng cũ | Entry progress mới nhất phải nêu behavior artifact đang đổi và command verify vừa chạy |
+| Feature không được đánh dấu sớm | Chỉ chấp nhận trạng thái verified khi có evidence gắn với verify command |
+| Quy tắc kiến trúc lặp lại | Dùng lint hoặc structural test thay cho review comment lặp lại |
+
+Phạm vi so sánh diff phải khớp workflow của project: nếu agent verify trước
+commit, có thể so với `HEAD`; nếu CI kiểm sau commit, phải so với base branch
+hoặc pull request base. Không chọn baseline diff mơ hồ vì gate sẽ cho qua đúng
+failure mode mà nó cần chặn.
+
+### Checklist bootstrap
+
+Khi tạo harness cho repository mới:
+
+1. Kiểm kê setup, test, CI, tài liệu và failure mode đang xảy ra.
+2. Tạo artifact tối thiểu trong bảng chuẩn bắt buộc; không thêm evaluator hoặc
+   automation khi chưa có lỗi tương ứng.
+3. Viết một feature đầu tiên mô tả chính harness và command verify của nó.
+4. Tạo smoke test rẻ nhất cho `init.sh` hoặc lệnh bootstrap tương đương.
+5. Tạo ít nhất một negative test chứng minh gate fail khi bỏ state update hoặc
+   phá invariant quan trọng.
+6. Chạy verify, ghi evidence vào feature state và progress, rồi mới dùng
+   harness cho task sản phẩm.
+
+Negative test là bước quan trọng: một verifier chỉ pass trên baseline hợp lệ
+chưa chứng minh nó chặn được lỗi quy trình cần kiểm soát. Đây là cách thực thi
+nguyên tắc biến feedback lặp lại thành guardrail cơ học [S1], đồng thời giữ
+state handoff kiểm chứng được giữa các session [S2].
+
 ## Phân tầng nguồn sự thật
 
 Giữ artifact ngắn, đúng vai, và dễ quét trong session mới.

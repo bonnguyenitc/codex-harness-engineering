@@ -2,7 +2,6 @@
 
 import { realpathSync } from "node:fs";
 import { access, cp, mkdir, rm } from "node:fs/promises";
-import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -31,13 +30,12 @@ async function assertCanWrite(target, force) {
 }
 
 export async function installSkills({
-  home = homedir(),
   packageRoot = PACKAGE_ROOT,
   projectRoot = process.cwd(),
   force = false,
 } = {}) {
   const sourceRoot = path.join(packageRoot, "skills");
-  const targetRoot = path.join(home, ".agents", "skills");
+  const targetRoot = path.join(projectRoot, ".agents", "skills");
   const docsSource = path.join(packageRoot, "docs", "harness-engineering");
   const docsTarget = path.join(projectRoot, "docs", "harness-engineering");
   const installed = [];

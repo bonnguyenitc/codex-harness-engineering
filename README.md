@@ -62,7 +62,7 @@ Chạy lệnh sau ở root của project muốn nhận docs:
 npx codex-harness-engineering init
 ```
 
-Lệnh này copy 3 skill vào `$HOME/.agents/skills` và copy docs vào
+Lệnh này copy 3 skill vào `./.agents/skills` và copy docs vào
 `./docs/harness-engineering` của project hiện tại. Nếu các target đã tồn tại,
 lệnh sẽ dừng để tránh ghi đè. Dùng `--force` khi muốn thay thế bản cũ:
 

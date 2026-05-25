@@ -32,5 +32,64 @@
       "2026-05-25: node --test tests/verify-harness.test.mjs passed with 4 tests passing.",
       "2026-05-25: npm run verify passed and reported Harness verification passed."
     ]
+  },
+  {
+    "id": "H003",
+    "title": "Project-local package skill installation",
+    "status": "verified",
+    "acceptance": [
+      "Running the package initializer installs bundled skills under the target project's .agents/skills directory.",
+      "The initializer does not install bundled skills into the user's home .agents/skills directory.",
+      "Documentation describes the project-local installation path."
+    ],
+    "verify": [
+      "node --test tests/install-skills.test.mjs",
+      "npm run verify",
+      "npm run pack:dry"
+    ],
+    "evidence": [
+      "2026-05-25: node --test tests/install-skills.test.mjs failed before the implementation change because project-local skill files were absent, then passed with 6 tests after the change.",
+      "2026-05-25: npm run verify passed with Harness verification passed and 10 tests passing.",
+      "2026-05-25: npm run pack:dry passed for codex-harness-engineering-0.1.3.tgz."
+    ]
+  },
+  {
+    "id": "H004",
+    "title": "Durable-state update gate for behavior changes",
+    "status": "verified",
+    "acceptance": [
+      "Verification fails when an open implementation or harness-behavior change omits feature_list.json or progress.md updates.",
+      "Verification fails when changed behavior artifacts are mentioned only in an older progress entry.",
+      "The agent contract requires state updates for small tasks that change behavior or guardrails."
+    ],
+    "verify": [
+      "node --test tests/verify-harness.test.mjs",
+      "npm run verify",
+      "npm run pack:dry"
+    ],
+    "evidence": [
+      "2026-05-25: regression tests failed before verifier changes because behavior diffs without current progress linkage were accepted.",
+      "2026-05-25: node --test tests/verify-harness.test.mjs passed with 7 tests after implementing the gate.",
+      "2026-05-25: npm run verify passed with Harness verification passed and 13 tests passing.",
+      "2026-05-25: npm run pack:dry passed for codex-harness-engineering-0.1.3.tgz."
+    ]
+  },
+  {
+    "id": "H005",
+    "title": "Reusable harness standard for target projects",
+    "status": "verified",
+    "acceptance": [
+      "The implementation playbook defines the minimum artifacts and state-update contract for a new target project.",
+      "The playbook defines a mechanical gate for behavior changes and explains how to choose the diff baseline.",
+      "The playbook provides a bootstrap checklist including a negative test for guardrail enforcement."
+    ],
+    "verify": [
+      "npm run verify",
+      "npm run pack:dry"
+    ],
+    "evidence": [
+      "2026-05-25: npm run verify passed with Harness verification passed and 13 tests passing.",
+      "2026-05-25: npm run pack:dry passed for codex-harness-engineering-0.1.3.tgz."
+    ]
   }
 ]
