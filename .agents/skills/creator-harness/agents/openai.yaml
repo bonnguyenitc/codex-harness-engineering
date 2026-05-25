@@ -1,0 +1,4 @@
+interface:
+  display_name: "Creator Harness"
+  short_description: "Design practical agent harnesses"
+  default_prompt: "Use $creator-harness to design a minimal harness for this repository."

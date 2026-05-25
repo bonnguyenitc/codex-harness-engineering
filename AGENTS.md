@@ -5,12 +5,13 @@ việc dài hạn.
 
 ## Phạm vi nguồn
 
-Chỉ dùng bốn bài sau:
+Chỉ dùng năm bài sau:
 
 - `[S1]` OpenAI, "Harness engineering: leveraging Codex in an agent-first world".
 - `[S2]` Anthropic, "Effective harnesses for long-running agents".
 - `[S3]` Anthropic, "Building effective agents".
 - `[S4]` Anthropic, "Harness design for long-running application development".
+- `[S5]` Google DeepMind, "AutoHarness: Improving LLM Agents by Automatically Synthesizing a Code Harness" & Google Cloud agent engineering practices.
 
 Không thêm resource, citation, paper, DOI, benchmark, hoặc blog khác nếu người
 dùng chưa yêu cầu mở rộng phạm vi.
@@ -27,8 +28,8 @@ dùng chưa yêu cầu mở rộng phạm vi.
 
 ## Quy tắc viết
 
-- Mọi nhận định quan trọng phải truy vết được về `[S1]`, `[S2]`, `[S3]`, hoặc
-  `[S4]`.
+- Mọi nhận định quan trọng phải truy vết được về `[S1]`, `[S2]`, `[S3]`, `[S4]`, hoặc
+  `[S5]`.
 - Không tự bịa citation, paper, tác giả, ngày tháng, DOI, benchmark, hoặc số
   liệu.
 - Nếu chưa xác minh được nguồn, đánh dấu rõ bằng marker tiếng Việt cho nội
@@ -40,7 +41,7 @@ dùng chưa yêu cầu mở rộng phạm vi.
 
 1. Đọc `docs/harness-engineering/sources.md`.
 2. Cập nhật phần liên quan trong research note hoặc playbook.
-3. Chỉ thêm nguồn mới nếu người dùng yêu cầu mở rộng ngoài bốn bài.
+3. Chỉ thêm nguồn mới nếu người dùng yêu cầu mở rộng ngoài năm bài.
 4. Kiểm tra placeholder và citation ngoài phạm vi trước khi hoàn tất.
 
 ## Ràng buộc local

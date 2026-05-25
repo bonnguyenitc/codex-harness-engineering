@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cleanup Harness"
+  short_description: "Scope cleanup with triggers and checks"
+  default_prompt: "Use $cleanup-harness to scope a cleanup task with trigger evidence, acceptance criteria, and verification."

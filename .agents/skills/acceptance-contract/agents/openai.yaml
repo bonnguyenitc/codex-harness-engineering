@@ -1,0 +1,4 @@
+interface:
+  display_name: "Acceptance Contract"
+  short_description: "Define scope, done criteria, and checks"
+  default_prompt: "Use $acceptance-contract to define scope, acceptance criteria, and verification for this task."
