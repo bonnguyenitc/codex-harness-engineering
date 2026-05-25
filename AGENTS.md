@@ -26,6 +26,21 @@ dùng chưa yêu cầu mở rộng phạm vi.
 - Danh mục nguồn đã xác minh nằm ở `docs/harness-engineering/sources.md`.
 - Skill thực hành tạo harness nằm ở `skills/creator-harness/SKILL.md`.
 
+## Bắt đầu session
+
+1. Đọc `README.md`, `progress.md`, và `feature_list.json`.
+2. Xem lịch sử git gần nhất để nhận biết thay đổi đang tiếp tục.
+3. Chạy `./init.sh` để kiểm tra baseline rẻ nhất trước khi sửa.
+4. Chỉ cập nhật trạng thái feature sau khi lệnh verify liên quan pass.
+5. Ghi kết quả kiểm chứng và bước tiếp theo vào `progress.md` khi task kéo dài.
+
+## Lệnh chuẩn
+
+- Smoke test đầu session: `./init.sh`.
+- Kiểm thử package: `npm test`.
+- Kiểm guardrail harness và test: `npm run verify`.
+- Kiểm nội dung package xuất bản: `npm run pack:dry`.
+
 ## Quy tắc viết
 
 - Mọi nhận định quan trọng phải truy vết được về `[S1]`, `[S2]`, `[S3]`, `[S4]`, hoặc

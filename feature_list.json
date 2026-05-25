@@ -1,0 +1,36 @@
+[
+  {
+    "id": "H001",
+    "title": "Durable repository harness state",
+    "status": "verified",
+    "acceptance": [
+      "A new agent session can find progress and feature state from repository files.",
+      "The bootstrap command runs the cheapest existing smoke test."
+    ],
+    "verify": [
+      "./init.sh",
+      "npm run verify"
+    ],
+    "evidence": [
+      "2026-05-25: ./init.sh passed with 10 tests passing.",
+      "2026-05-25: npm run verify passed."
+    ]
+  },
+  {
+    "id": "H002",
+    "title": "Citation and documentation-map guardrail",
+    "status": "verified",
+    "acceptance": [
+      "Markdown harness sources reject citations outside [S1]-[S5].",
+      "Verification fails when a required harness artifact is missing."
+    ],
+    "verify": [
+      "node --test tests/verify-harness.test.mjs",
+      "npm run verify"
+    ],
+    "evidence": [
+      "2026-05-25: node --test tests/verify-harness.test.mjs passed with 4 tests passing.",
+      "2026-05-25: npm run verify passed and reported Harness verification passed."
+    ]
+  }
+]

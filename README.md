@@ -45,10 +45,13 @@ Kho này biến năm nguồn thành một harness tối thiểu cho Codex:
 | `docs/harness-engineering/index.md` | Mục lục và thứ tự đọc |
 | `docs/harness-engineering/research-note.md` | Bản tổng hợp nghiên cứu chính |
 | `docs/harness-engineering/implementation-playbook.md` | Playbook triển khai harness cho repository |
-| `docs/harness-engineering/sources.md` | Metadata và bản đồ bằng chứng cho bốn nguồn |
+| `docs/harness-engineering/sources.md` | Metadata và bản đồ bằng chứng cho năm nguồn |
 | `skills/creator-harness/SKILL.md` | Skill thực hành tạo harness tối thiểu |
 | `skills/acceptance-contract/SKILL.md` | Skill chốt scope, tiêu chí done, và verification trước khi làm |
 | `skills/cleanup-harness/SKILL.md` | Skill cleanup có trigger, acceptance criteria, và rollback |
+| `progress.md` | Trạng thái bền vững để session sau tiếp tục công việc |
+| `feature_list.json` | Danh sách capability harness và điều kiện verify |
+| `init.sh` | Smoke test đầu session |
 
 ## Phát hành qua NPM
 
@@ -70,6 +73,7 @@ npx codex-harness-engineering init --force
 Khi phát triển local:
 
 ```bash
+npm run verify
 npm test
 npm run pack:dry
 node scripts/install-skills.mjs init
