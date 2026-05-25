@@ -48,15 +48,19 @@ export async function installSkills({
     const source = path.join(sourceRoot, skillName);
     const target = path.join(targetRoot, skillName);
 
-    await assertCanWrite(target, force);
-    await rm(target, { recursive: true, force: true });
-    await cp(source, target, { recursive: true, force: true });
+    if (path.resolve(source) !== path.resolve(target)) {
+      await assertCanWrite(target, force);
+      await rm(target, { recursive: true, force: true });
+      await cp(source, target, { recursive: true, force: true });
+    }
     installed.push(skillName);
   }
 
-  await assertCanWrite(docsTarget, force);
-  await rm(docsTarget, { recursive: true, force: true });
-  await cp(docsSource, docsTarget, { recursive: true, force: true });
+  if (path.resolve(docsSource) !== path.resolve(docsTarget)) {
+    await assertCanWrite(docsTarget, force);
+    await rm(docsTarget, { recursive: true, force: true });
+    await cp(docsSource, docsTarget, { recursive: true, force: true });
+  }
 
   return { targetRoot, docsTarget, installed };
 }

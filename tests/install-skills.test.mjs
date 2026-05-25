@@ -110,3 +110,39 @@ test("installSkills overwrites existing targets with force", async () => {
     await rm(projectRoot, { recursive: true, force: true });
   }
 });
+
+test("installSkills does not delete or fail when projectRoot is the same as packageRoot", async () => {
+  const tempPackageRoot = await mkdtemp(path.join(tmpdir(), "harness-pkg-"));
+  const home = await mkdtemp(path.join(tmpdir(), "harness-skills-"));
+
+  try {
+    const tempSkills = path.join(tempPackageRoot, "skills");
+    const tempDocs = path.join(tempPackageRoot, "docs", "harness-engineering");
+
+    await mkdir(tempSkills, { recursive: true });
+    await mkdir(tempDocs, { recursive: true });
+
+    for (const skillName of SKILL_NAMES) {
+      const sDir = path.join(tempSkills, skillName);
+      await mkdir(sDir, { recursive: true });
+      await writeFile(path.join(sDir, "SKILL.md"), `---\nname: ${skillName}\n---`, "utf8");
+    }
+
+    await writeFile(path.join(tempDocs, "index.md"), "Harness Engineering", "utf8");
+
+    const result = await installSkills({
+      home,
+      packageRoot: tempPackageRoot,
+      projectRoot: tempPackageRoot,
+      force: true
+    });
+
+    assert.deepEqual(result.installed.sort(), [...SKILL_NAMES].sort());
+
+    const docsContent = await readFile(path.join(tempPackageRoot, "docs", "harness-engineering", "index.md"), "utf8");
+    assert.match(docsContent, /Harness Engineering/);
+  } finally {
+    await rm(home, { recursive: true, force: true });
+    await rm(tempPackageRoot, { recursive: true, force: true });
+  }
+});
