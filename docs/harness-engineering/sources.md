@@ -74,6 +74,18 @@ này hoặc không được đánh dấu rõ là diễn giải.
   - nguyên tắc xem lại harness khi model mới làm một số lớp orchestration không
     còn load-bearing.
 
+### [S5] Google
+
+- Tiêu đề: "AutoHarness: Improving LLM Agents by Automatically Synthesizing a Code Harness" (Google DeepMind) và thực tiễn vận hành Agent/Evaluation Harness trên Google Cloud.
+- Tác giả: Google DeepMind & Google Cloud
+- Ngày xuất bản: 2024-2026
+- URL: https://arxiv.org/abs/2406.11252
+- Dùng cho:
+  - AutoHarness: Tự động tổng hợp lớp bọc thực thi (code harness/wrapper) bằng LLM để chặn hành động lỗi và cưỡng chế ràng buộc;
+  - Harness-as-Policy: Biên dịch chính sách quyết định thành code tĩnh để giảm chi phí/độ trễ runtime về 0;
+  - Trajectory Evaluation: Đánh giá vết chạy đầy đủ (gồm tool call, suy luận) thay vì chỉ chấm điểm kết quả tĩnh;
+  - LLM-as-a-Judge tự động & Meta-Evaluation (VeRO) để liên tục tối ưu cấu trúc của agent.
+
 ## Bản đồ bằng chứng
 
 | Nhận định | Nguồn |
@@ -100,10 +112,14 @@ này hoặc không được đánh dấu rõ là diễn giải.
 | Context reset có thể là một phần chủ đích của harness; nếu state handoff đủ tốt, reset giúp giữ model bám task thay vì trượt theo context anxiety. | [S4] |
 | Harness phức tạp có thể tốn nhiều giờ và token, nên phải được xem là tradeoff thay vì mặc định. | [S4] |
 | Khi model mới xuất hiện, nên xem lại và loại bỏ các phần harness không còn tạo giá trị. | [S4] |
+| Thay vì tự viết thủ công mọi ràng buộc, mô hình (như Gemini Flash) có thể tự động tổng hợp lớp bọc thực thi (AutoHarness) bằng code để lọc các hành động lỗi. | [S5] |
+| Biên dịch chính sách quyết định thành code tĩnh (Harness-as-Policy) giúp loại bỏ việc gọi mô hình ở runtime, tối ưu hóa chi phí và độ trễ. | [S5] |
+| Đánh giá agent dài hạn cần dựa trên vết chạy đầy đủ (Trajectory Evaluation) bao gồm cả chuỗi gọi tool và suy luận, thay vì chỉ so sánh kết quả đầu ra tĩnh. | [S5] |
+| LLM-as-a-Judge tự động giúp đo lường độ an toàn và hiệu năng của agent liên tục, và Meta-Evaluation (VeRO) tối ưu hóa cấu trúc của harness dựa trên phản hồi. | [S5] |
 
 ## Chính sách citation
 
-- Chỉ dùng mã `[S1]`, `[S2]`, `[S3]`, `[S4]`.
+- Chỉ dùng mã `[S1]`, `[S2]`, `[S3]`, `[S4]`, `[S5]`.
 - Không thêm citation, paper, DOI, benchmark, hoặc blog ngoài phạm vi nếu chưa
   được yêu cầu.
 - Nếu mở rộng phạm vi sau này, phải cập nhật file này trước rồi mới cập nhật

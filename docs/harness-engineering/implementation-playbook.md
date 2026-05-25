@@ -1,6 +1,6 @@
 # Playbook triển khai harness
 
-Playbook này chuyển bốn bài OpenAI/Anthropic thành quy trình thiết kế harness
+Playbook này chuyển năm bài OpenAI/Anthropic/Google thành quy trình thiết kế harness
 cho repository phần mềm.
 
 ## Giả định
@@ -24,6 +24,8 @@ cho repository phần mềm.
 | Agent tự đánh giá quá lạc quan | Evaluator riêng + feedback cụ thể | [S4] |
 | Prompt mơ hồ hoặc app nhiều luồng | Planner + sprint contract + generator/evaluator | [S4] |
 | Throughput tạo drift kiến trúc | Lint, structural test, CI rule, cleanup định kỳ | [S1] |
+| Ràng buộc quá phức tạp để code thủ công | AutoHarness (yêu cầu LLM sinh wrapper bọc thực thi tự động) | [S5] |
+| Hành vi agent drift/cần tối ưu hóa vết chạy | Trajectory evaluation + LLM-as-a-judge + Meta-Evaluation (VeRO) | [S5] |
 
 Nếu không có failure mode cụ thể, chưa thêm lớp harness đó.
 
@@ -193,6 +195,11 @@ Evaluator tốt phải nêu bằng chứng: screenshot, DOM state, API response,
 state, log, trace, hoặc command output. Feedback nên nói tiêu chí nào fail và
 bước sửa tiếp theo là gì [S4].
 
+Bên cạnh đó, áp dụng **đánh giá vết thực thi (Trajectory Evaluation)** để đánh giá cả
+chuỗi hành động và suy luận của agent (tool calling sequence, logic steps) thông qua
+**LLM-as-a-judge** tự động để chấm điểm hiệu năng thực tế. Có thể dùng **VeRO (Meta-Evaluation)**
+để chạy một vòng lặp tối ưu hóa tự động cấu trúc prompt/tool dựa trên các vết chạy lỗi [S5].
+
 ## Legibility map
 
 Khi agent không thấy hành vi thật, bổ sung tín hiệu theo bảng sau.
@@ -226,7 +233,9 @@ Ví dụ:
 - yêu cầu structured logging ở luồng quan trọng;
 - giới hạn file size nếu drift kích thước gây hại;
 - chặn update feature status nếu verify chưa pass;
-- chạy smoke test trước merge.
+- chạy smoke test trước merge;
+- dùng AutoHarness để tự động sinh lớp bọc thực thi (code harness) khi môi trường có quá nhiều luật phức tạp hoặc khó kiểm soát bằng linter tĩnh [S5]. Lớp bọc này lọc và chặn các hành vi vi phạm trước khi thực thi [S5];
+- biên dịch chính sách quyết định thành code tĩnh (Harness-as-Policy) để thực thi nhanh và tiết kiệm token ở runtime [S5].
 
 Guardrail chỉ nên bảo vệ invariant thật. Rule quá rộng tạo nhiễu và làm agent
 tối ưu quanh check thay vì quanh mục tiêu [S1], [S3].
@@ -259,6 +268,8 @@ Sau khi model hoặc tooling thay đổi, xem lại harness:
 | Evaluator | Nếu gộp vào generator, chất lượng có giảm không? |
 | Planner | Nếu bỏ planner, scope có drift không? |
 | Guardrail | Nếu tắt rule, vi phạm có xuất hiện lại không? |
+| AutoHarness | Nếu dùng code tĩnh thay vì gọi LLM ở runtime, latency và cost có giảm đáng kể mà vẫn giữ được chất lượng không? [S5] |
+| Trajectory Eval | Nếu không chấm vết chạy mà chỉ chấm kết quả tĩnh, ta có bỏ sót các lỗi tiềm ẩn trong suy luận của agent không? [S5] |
 
 Giữ phần rẻ và hiệu quả. Loại bỏ orchestration đắt nếu không còn tạo outcome
 tốt hơn [S4].
@@ -271,5 +282,5 @@ Một thay đổi harness hoàn thành khi:
 - lệnh hoặc quan sát verify đã chạy;
 - state/progress chỉ cập nhật sau verify;
 - guardrail mới gắn với failure mode thật;
-- tài liệu chỉ cite `[S1]-[S4]`;
+- tài liệu chỉ cite `[S1]-[S5]`;
 - không còn placeholder hoặc nguồn ngoài phạm vi.
